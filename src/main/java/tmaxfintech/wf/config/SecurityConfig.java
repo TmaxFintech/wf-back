@@ -6,20 +6,38 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter;
+import tmaxfintech.wf.config.jwt.JwtAuthenticationFilter;
+import tmaxfintech.wf.config.jwt.JwtAuthorizationFilter;
+import tmaxfintech.wf.domain.user.repository.UserRepository;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final CorsFilter corsFilter;
+    private final UserRepository userRepository;
+
+    public SecurityConfig(CorsFilter corsFilter, UserRepository userRepository) {
+        this.corsFilter = corsFilter;
+        this.userRepository = userRepository;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .addFilter(corsFilter)
                 .formLogin().disable()
                 .httpBasic().disable()
-                .addFilterBefore(new CustomFilter("/users/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter("/users/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), userRepository))
                 .authorizeRequests()
+                .antMatchers("/user/**")
+                .access("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+                .antMatchers("/admin/**")
+                .access("hasRole('ROLE_ADMIN')")
                 .anyRequest().permitAll();
     }
 }

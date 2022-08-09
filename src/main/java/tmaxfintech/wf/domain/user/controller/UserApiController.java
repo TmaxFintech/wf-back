@@ -1,11 +1,11 @@
 package tmaxfintech.wf.domain.user.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import tmaxfintech.wf.config.jwt.JwtProperty;
 import tmaxfintech.wf.domain.user.dto.JoinRequestDto;
+import tmaxfintech.wf.domain.user.dto.UpdateRequestDto;
 import tmaxfintech.wf.domain.user.service.UserService;
 import tmaxfintech.wf.util.response.DefaultResponse;
 
@@ -28,6 +28,15 @@ public class UserApiController {
         return userService.join(joinRequestDto);
     }
 
+    @PutMapping ("/users")
+    ResponseEntity<DefaultResponse> updateUser(@RequestBody UpdateRequestDto updateRequestDto, @RequestHeader HttpHeaders headers){
+        String jwtToken = getJwtToken(headers);
+        return userService.updatePassword(jwtToken, updateRequestDto.getPassword());
+    }
+
+    private String getJwtToken(HttpHeaders headers) {
+        return headers.get("Authorization").get(0).replace(JwtProperty.TOKEN_PREFIX, "");
+    }
 
     @GetMapping("/user")
     public String user() {

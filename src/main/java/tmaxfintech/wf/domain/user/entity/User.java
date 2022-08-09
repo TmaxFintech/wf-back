@@ -85,4 +85,8 @@ public class User {
         setUserRoleType(userRoleType);
         setJoinDate(joinDate);
     }
+
+    public void changePassword(String password) {
+        setPassword(password);
+    }
 }

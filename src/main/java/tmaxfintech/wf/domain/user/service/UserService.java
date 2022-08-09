@@ -8,4 +8,5 @@ public interface UserService {
 
     ResponseEntity<DefaultResponse> join(JoinRequestDto joinRequestDto);
 
+    ResponseEntity<DefaultResponse> updatePassword(String jwtToken, String rawPassword);
 }

@@ -1,10 +1,15 @@
 package tmaxfintech.wf.domain.user.service.impl;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import tmaxfintech.wf.config.jwt.JwtProperty;
 import tmaxfintech.wf.domain.user.dto.JoinRequestDto;
 import tmaxfintech.wf.domain.user.entity.User;
 import tmaxfintech.wf.domain.user.entity.UserRoleType;
@@ -22,6 +27,11 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${responseMessage.UPDATE_USER_FAIL}")
+    private String UPDATE_USER_FAIL;
+    @Value("${responseMessage.UPDATE_USER_SUCCESS}")
+    private String UPDATE_USER_SUCCESS;
+
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -29,6 +39,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
+    @ConfigurationProperties("responseMessage")
     public ResponseEntity<DefaultResponse> join(@RequestBody JoinRequestDto joinRequestDto) {
         ResponseEntity responseEntity = checkDuplication(joinRequestDto);
         if (responseEntity != null) return responseEntity;
@@ -67,5 +78,24 @@ public class UserServiceImpl implements UserService {
         userEntity.setPasswordandUserRoleTypeandJoinDate(passwordEncoder.encode(joinRequestDto.getPassword()),
                 UserRoleType.ROLE_USER, new Timestamp(System.currentTimeMillis()));
         return userEntity;
+    }
+
+    @Transactional
+    public ResponseEntity<DefaultResponse> updatePassword(String jwtToken, String rawPassword) {
+        String username = getUsernamefromJwtToken(jwtToken);
+        User user = userRepository.findByUsername(username);
+        if (isMatchedPassword(rawPassword, user.getPassword())) {
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), UPDATE_USER_FAIL, null), HttpStatus.CONFLICT);
+        }
+        user.changePassword(passwordEncoder.encode(rawPassword));
+        return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), UPDATE_USER_SUCCESS, null), HttpStatus.OK);
+    }
+
+    private boolean isMatchedPassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    private String getUsernamefromJwtToken(String jwtToken) {
+        return JWT.require(Algorithm.HMAC512(JwtProperty.SECRET)).build().verify(jwtToken).getClaim("username").asString();
     }
 }

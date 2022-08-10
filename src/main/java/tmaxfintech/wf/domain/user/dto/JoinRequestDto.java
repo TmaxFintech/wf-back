@@ -51,7 +51,7 @@ public class JoinRequestDto {
         return password;
     }
 
-    public User dtoToEntity(JoinRequestDto joinRequestDto) {
+    public User ToEntity(JoinRequestDto joinRequestDto) {
         return User.builder()
                 .bankName(joinRequestDto.getBankName())
                 .accountNumber(joinRequestDto.getAccountNumber())

@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import tmaxfintech.wf.config.auth.PrincipalDetails;
 import tmaxfintech.wf.domain.user.entity.User;
+import tmaxfintech.wf.exception.UserNotFoundException;
 import tmaxfintech.wf.domain.user.repository.UserRepository;
 
 import javax.servlet.FilterChain;
@@ -37,7 +38,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String jwtToken = request.getHeader(JwtProperty.HEADER_STRING).replace(JwtProperty.TOKEN_PREFIX, "");
         String username = JWT.require(Algorithm.HMAC512(JwtProperty.SECRET)).build().verify(jwtToken).getClaim("username").asString();
         if (username != null) {
-            User userEntity = userRepository.findByUsername(username);
+            User userEntity = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
             PrincipalDetails principalDetails = new PrincipalDetails(userEntity);
             Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails, null, principalDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -28,8 +28,8 @@ public class UserApiController {
         return userService.join(joinRequestDto);
     }
 
-    @PutMapping ("/users")
-    ResponseEntity<DefaultResponse> updateUser(@RequestBody UpdateRequestDto updateRequestDto, @RequestHeader HttpHeaders headers){
+    @PutMapping("/users")
+    ResponseEntity<DefaultResponse> updateUser(@RequestBody UpdateRequestDto updateRequestDto, @RequestHeader HttpHeaders headers) {
         String jwtToken = getJwtToken(headers);
         return userService.updatePassword(jwtToken, updateRequestDto.getPassword());
     }

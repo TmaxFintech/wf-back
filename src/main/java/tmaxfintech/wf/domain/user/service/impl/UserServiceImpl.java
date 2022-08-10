@@ -13,13 +13,13 @@ import tmaxfintech.wf.config.jwt.JwtProperty;
 import tmaxfintech.wf.domain.user.dto.JoinRequestDto;
 import tmaxfintech.wf.domain.user.entity.User;
 import tmaxfintech.wf.domain.user.entity.UserRoleType;
+import tmaxfintech.wf.exception.UserNotFoundException;
 import tmaxfintech.wf.domain.user.repository.UserRepository;
 import tmaxfintech.wf.domain.user.service.UserService;
 import tmaxfintech.wf.util.response.DefaultResponse;
-import tmaxfintech.wf.util.response.ResponseMessage;
-
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,6 +32,18 @@ public class UserServiceImpl implements UserService {
     @Value("${responseMessage.UPDATE_USER_SUCCESS}")
     private String UPDATE_USER_SUCCESS;
 
+    @Value("${responseMessage.DUPLICATED_USERNAME}")
+    private String DUPLICATED_USERNAME;
+
+    @Value("${responseMessage.DUPLICATED_ACCOUNTNUMBER}")
+    private String DUPLICATED_ACCOUNTNUMBER;
+
+    @Value("${responseMessage.DUPLICATED_PHONENUMBER}")
+    private String DUPLICATED_PHONENUMBER;
+
+    @Value("${responseMessage.JOIN_SUCCESS}")
+    private String JOIN_SUCCESS;
+
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -41,25 +53,26 @@ public class UserServiceImpl implements UserService {
     @Override
     @ConfigurationProperties("responseMessage")
     public ResponseEntity<DefaultResponse> join(@RequestBody JoinRequestDto joinRequestDto) {
-        ResponseEntity responseEntity = checkDuplication(joinRequestDto);
-        if (responseEntity != null) return responseEntity;
+        return joinAfterCheckDuplication(joinRequestDto);
+    }
 
+    private ResponseEntity joinAfterCheckDuplication(JoinRequestDto joinRequestDto) {
+        if(!(userRepository.findByUsername((joinRequestDto.getUsername())).equals(Optional.empty()))){
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), DUPLICATED_USERNAME, null), HttpStatus.CONFLICT);
+        }else if(!(userRepository.findByAccountNumber((joinRequestDto.getAccountNumber())).equals(Optional.empty()))){
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), DUPLICATED_ACCOUNTNUMBER, null), HttpStatus.CONFLICT);
+        }else if(!(userRepository.findByPhoneNumber((joinRequestDto.getPhoneNumber())).equals(Optional.empty()))){
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), DUPLICATED_PHONENUMBER, null), HttpStatus.CONFLICT);
+        } return joinUser(joinRequestDto);
+    }
+
+    private ResponseEntity joinUser(JoinRequestDto joinRequestDto) {
         User userEntity = createUser(joinRequestDto);
         userRepository.save(userEntity);
 
-        return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), ResponseMessage.JOIN_SUCCESS, null), HttpStatus.OK);
+        return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), JOIN_SUCCESS, null), HttpStatus.OK);
     }
 
-    private ResponseEntity checkDuplication(JoinRequestDto joinRequestDto) {
-        if (isDuplicatedUsername(userRepository.findByUsername(joinRequestDto.getUsername()))) {
-            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), ResponseMessage.DUPLICATED_USERNAME, null), HttpStatus.CONFLICT);
-        } else if (isDuplicatedAccountNumber(userRepository.findByAccountNumber(joinRequestDto.getAccountNumber()))) {
-            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), ResponseMessage.DUPLICATED_ACCOUNTNUMBER, null), HttpStatus.CONFLICT);
-        } else if (isDuplicatedPhoneNumber(userRepository.findByPhoneNumber(joinRequestDto.getPhoneNumber()))) {
-            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), ResponseMessage.DUPLICATED_PHONENUMBER, null), HttpStatus.CONFLICT);
-        }
-        return null;
-    }
 
     private boolean isDuplicatedPhoneNumber(User user) {
         return user != null;
@@ -74,7 +87,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private User createUser(JoinRequestDto joinRequestDto) {
-        User userEntity = joinRequestDto.dtoToEntity(joinRequestDto);
+        User userEntity = joinRequestDto.ToEntity(joinRequestDto);
         userEntity.setPasswordandUserRoleTypeandJoinDate(passwordEncoder.encode(joinRequestDto.getPassword()),
                 UserRoleType.ROLE_USER, new Timestamp(System.currentTimeMillis()));
         return userEntity;
@@ -83,7 +96,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public ResponseEntity<DefaultResponse> updatePassword(String jwtToken, String rawPassword) {
         String username = getUsernamefromJwtToken(jwtToken);
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User Not Found"));
         if (isMatchedPassword(rawPassword, user.getPassword())) {
             return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), UPDATE_USER_FAIL, null), HttpStatus.CONFLICT);
         }

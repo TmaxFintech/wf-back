@@ -11,6 +11,7 @@ import tmaxfintech.wf.config.auth.PrincipalDetails;
 import tmaxfintech.wf.domain.user.entity.User;
 import tmaxfintech.wf.exception.UserNotFoundException;
 import tmaxfintech.wf.domain.user.repository.UserRepository;
+import tmaxfintech.wf.util.jwt.JwtUtility;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,9 +23,20 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private UserRepository userRepository;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
+//    @Autowired
+//    private JwtUtility jwtUtility;
+
+    private final JwtUtility jwtUtility;
+
+//    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
+//        super(authenticationManager);
+//        this.userRepository = userRepository;
+//    }
+
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository, JwtUtility jwtUtility) {
         super(authenticationManager);
         this.userRepository = userRepository;
+        this.jwtUtility = jwtUtility;
     }
 
     @Override

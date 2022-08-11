@@ -11,6 +11,7 @@ import org.springframework.web.filter.CorsFilter;
 import tmaxfintech.wf.config.jwt.JwtAuthenticationFilter;
 import tmaxfintech.wf.config.jwt.JwtAuthorizationFilter;
 import tmaxfintech.wf.domain.user.repository.UserRepository;
+import tmaxfintech.wf.util.jwt.JwtUtility;
 
 @Configuration
 @EnableWebSecurity
@@ -21,11 +22,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final ObjectMapper objectMapper;
 
-    public SecurityConfig(CorsFilter corsFilter, UserRepository userRepository, ObjectMapper objectMapper) {
+    private final JwtUtility jwtUtility;
+
+//    public SecurityConfig(CorsFilter corsFilter, UserRepository userRepository) {
+//        this.corsFilter = corsFilter;
+//        this.userRepository = userRepository;
+//    }
+
+    public SecurityConfig(CorsFilter corsFilter, UserRepository userRepository, ObjectMapper objectMapper, JwtUtility jwtUtility) {
         this.corsFilter = corsFilter;
         this.userRepository = userRepository;
         this.objectMapper = objectMapper;
+        this.jwtUtility = jwtUtility;
     }
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -35,8 +45,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(corsFilter)
                 .formLogin().disable()
                 .httpBasic().disable()
-                .addFilterBefore(new JwtAuthenticationFilter("/users/login", authenticationManager(), objectMapper), UsernamePasswordAuthenticationFilter.class)
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), userRepository))
+                .addFilterBefore(new JwtAuthenticationFilter("/users/login", authenticationManager(), objectMapper, jwtUtility), UsernamePasswordAuthenticationFilter.class)
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), userRepository, jwtUtility))
                 .authorizeRequests()
                 .antMatchers("/user/**")
                 .access("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")

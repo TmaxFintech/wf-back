@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -59,11 +58,11 @@ public class UserServiceImpl implements UserService {
 
     private ResponseEntity joinAfterCheckExistence(JoinRequestDto joinRequestDto) {
         if(!userRepository.findByUsername(joinRequestDto.getUsername()).equals(Optional.empty())){
-            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), EXISTED_USERNAME, null), HttpStatus.CONFLICT);
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), EXISTED_USERNAME), HttpStatus.CONFLICT);
         }else if(!userRepository.findByBankNameAndAccountNumber(joinRequestDto.getBankName(), joinRequestDto.getAccountNumber()).equals(Optional.empty())){
-            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), EXISTED_ACCOUNT, null), HttpStatus.CONFLICT);
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), EXISTED_ACCOUNT), HttpStatus.CONFLICT);
         }else if(!userRepository.findByPhoneNumber(joinRequestDto.getPhoneNumber()).equals(Optional.empty())){
-            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), EXISTED_PHONENUMBER, null), HttpStatus.CONFLICT);
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), EXISTED_PHONENUMBER), HttpStatus.CONFLICT);
         } return joinUser(joinRequestDto);
 
     }
@@ -72,20 +71,7 @@ public class UserServiceImpl implements UserService {
         User userEntity = createUser(joinRequestDto);
         userRepository.save(userEntity);
 
-        return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), JOIN_SUCCESS, null), HttpStatus.OK);
-    }
-
-
-    private boolean isExistedPhoneNumber(User user) {
-        return user != null;
-    }
-
-    private boolean isExistedAccountNumber(User user) {
-        return user != null;
-    }
-
-    private boolean isExistedUsername(User user) {
-        return user != null;
+        return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), JOIN_SUCCESS), HttpStatus.OK);
     }
 
     private User createUser(JoinRequestDto joinRequestDto) {
@@ -100,10 +86,10 @@ public class UserServiceImpl implements UserService {
         String username = getUsernamefromJwtToken(jwtToken);
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User Not Found"));
         if (isMatchedPassword(rawPassword, user.getPassword())) {
-            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), UPDATE_USER_FAIL, null), HttpStatus.CONFLICT);
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), UPDATE_USER_FAIL), HttpStatus.CONFLICT);
         }
         user.changePassword(passwordEncoder.encode(rawPassword));
-        return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), UPDATE_USER_SUCCESS, null), HttpStatus.OK);
+        return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), UPDATE_USER_SUCCESS), HttpStatus.OK);
     }
 
     private boolean isMatchedPassword(String rawPassword, String encodedPassword) {
@@ -112,9 +98,5 @@ public class UserServiceImpl implements UserService {
 
     private String getUsernamefromJwtToken(String jwtToken) {
         return JWT.require(Algorithm.HMAC512(JwtProperty.SECRET)).build().verify(jwtToken).getClaim("username").asString();
-    }
-
-    private String getJwtToken(HttpHeaders headers) {
-        return headers.get("Authorization").get(0).replace(JwtProperty.TOKEN_PREFIX, "");
     }
 }

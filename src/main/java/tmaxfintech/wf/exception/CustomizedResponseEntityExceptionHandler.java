@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import tmaxfintech.wf.util.response.DefaultResponse;
@@ -32,7 +31,7 @@ public class CustomizedResponseEntityExceptionHandler {
         ExceptionResponse exceptionResponse =
                 new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
 
-        return new ResponseEntity(DefaultResponse.response(HttpStatus.UNAUTHORIZED.value(), NOT_FOUND_USER, null), HttpStatus.NOT_FOUND);
+        return new ResponseEntity(DefaultResponse.response(HttpStatus.UNAUTHORIZED.value(), NOT_FOUND_USER), HttpStatus.NOT_FOUND);
     }
 
 }

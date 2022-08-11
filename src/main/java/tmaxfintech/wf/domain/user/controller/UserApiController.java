@@ -29,7 +29,7 @@ public class UserApiController {
     }
 
     @PutMapping("/users")
-    ResponseEntity<DefaultResponse> updateUser(@RequestBody UpdateRequestDto updateRequestDto, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<DefaultResponse> updateUser(@RequestBody UpdateRequestDto updateRequestDto, @RequestHeader HttpHeaders headers) {
         String jwtToken = getJwtToken(headers);
         return userService.updatePassword(jwtToken, updateRequestDto.getPassword());
     }

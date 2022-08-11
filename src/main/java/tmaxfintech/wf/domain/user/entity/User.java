@@ -2,6 +2,7 @@ package tmaxfintech.wf.domain.user.entity;
 
 import lombok.Builder;
 import org.hibernate.annotations.CreationTimestamp;
+import tmaxfintech.wf.domain.user.dto.LoginResponseDto;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -88,5 +89,9 @@ public class User {
 
     public void changePassword(String password) {
         setPassword(password);
+    }
+
+    public LoginResponseDto toLoginResponseDto() {
+        return new LoginResponseDto(name);
     }
 }

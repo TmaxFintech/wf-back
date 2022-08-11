@@ -19,7 +19,7 @@ public class Coin {
 
     private Double price;
 
-    public Coin() {
+    protected Coin() {
     }
 
     public Coin(Long id, String symbol, Double price) {

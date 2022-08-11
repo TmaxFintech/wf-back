@@ -31,11 +31,11 @@ public class CandleService {
 
     private Candle createCandleWithCandleList(List<String> candleList) {
         return Candle.builder()
-                .openTime(Double.parseDouble(candleList.get(0)))
-                .open(Double.parseDouble(candleList.get(1)))
-                .high(Double.parseDouble(candleList.get(2)))
-                .low(Double.parseDouble(candleList.get(3)))
-                .close(Double.parseDouble(candleList.get(4)))
+                .openTime(Long.parseLong(candleList.get(0)))
+                .openPrice(Double.parseDouble(candleList.get(1)))
+                .highPrice(Double.parseDouble(candleList.get(2)))
+                .lowPrice(Double.parseDouble(candleList.get(3)))
+                .closePrice(Double.parseDouble(candleList.get(4)))
                 .volume(Double.parseDouble(candleList.get(5)))
                 .closeTime(Long.parseLong(candleList.get(6)))
                 .quoteAssetVolume(Double.parseDouble(candleList.get(7)))

@@ -14,15 +14,15 @@ public class Candle {
     @GeneratedValue
     private Long id;
 
-    private Double openTime;
+    private Long openTime;
 
-    private Double open;
+    private Double openPrice;
 
-    private Double high;
+    private Double highPrice;
 
-    private Double low;
+    private Double lowPrice;
 
-    private Double close;
+    private Double closePrice;
 
     private Double volume;
 
@@ -38,16 +38,16 @@ public class Candle {
 
     private Double ignores;
 
-    public Candle() {
+    protected Candle() {
     }
 
-    public Candle(Long id, Double openTime, Double open, Double high, Double low, Double close, Double volume, Long closeTime, Double quoteAssetVolume, Long numberOfTrades, Double takerBuyBaseAssetVolume, Double takerBuyQuoteAssetVolume, Double ignores) {
+    public Candle(Long id, Long openTime, Double openPrice, Double highPrice, Double lowPrice, Double closePrice, Double volume, Long closeTime, Double quoteAssetVolume, Long numberOfTrades, Double takerBuyBaseAssetVolume, Double takerBuyQuoteAssetVolume, Double ignores) {
         this.id = id;
         this.openTime = openTime;
-        this.open = open;
-        this.high = high;
-        this.low = low;
-        this.close = close;
+        this.openPrice = openPrice;
+        this.highPrice = highPrice;
+        this.lowPrice = lowPrice;
+        this.closePrice = closePrice;
         this.volume = volume;
         this.closeTime = closeTime;
         this.quoteAssetVolume = quoteAssetVolume;
@@ -57,24 +57,24 @@ public class Candle {
         this.ignores = ignores;
     }
 
-    public Double getOpenTime() {
+    public Long getOpenTime() {
         return openTime;
     }
 
-    public Double getOpen() {
-        return open;
+    public Double getOpenPrice() {
+        return openPrice;
     }
 
-    public Double getHigh() {
-        return high;
+    public Double getHighPrice() {
+        return highPrice;
     }
 
-    public Double getLow() {
-        return low;
+    public Double getLowPrice() {
+        return lowPrice;
     }
 
-    public Double getClose() {
-        return close;
+    public Double getClosePrice() {
+        return closePrice;
     }
 
     public Double getVolume() {

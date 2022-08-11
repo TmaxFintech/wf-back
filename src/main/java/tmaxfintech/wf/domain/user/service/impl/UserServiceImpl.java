@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     private ResponseEntity checkDuplication(JoinRequestDto joinRequestDto) {
         if (isDuplicatedUsername(userRepository.findByUsername(joinRequestDto.getUsername()))) {
             return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), ResponseMessage.DUPLICATED_USERNAME, null), HttpStatus.CONFLICT);
-        } else if (isDuplicatedAccountNumber(userRepository.findByAccountNumber(joinRequestDto.getAccountNumber()))) {
+        } else if (isDuplicatedAccountNumber(userRepository.findByBankNameAndAccountNumber(joinRequestDto.getBankName(), joinRequestDto.getAccountNumber()))) {
             return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), ResponseMessage.DUPLICATED_ACCOUNTNUMBER, null), HttpStatus.CONFLICT);
         } else if (isDuplicatedPhoneNumber(userRepository.findByPhoneNumber(joinRequestDto.getPhoneNumber()))) {
             return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), ResponseMessage.DUPLICATED_PHONENUMBER, null), HttpStatus.CONFLICT);

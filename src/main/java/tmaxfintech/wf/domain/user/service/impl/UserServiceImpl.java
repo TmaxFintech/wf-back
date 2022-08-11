@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,14 +33,14 @@ public class UserServiceImpl implements UserService {
     @Value("${responseMessage.UPDATE_USER_SUCCESS}")
     private String UPDATE_USER_SUCCESS;
 
-    @Value("${responseMessage.DUPLICATED_USERNAME}")
-    private String DUPLICATED_USERNAME;
+    @Value("${responseMessage.EXISTED_USERNAME}")
+    private String EXISTED_USERNAME;
 
-    @Value("${responseMessage.DUPLICATED_ACCOUNTNUMBER}")
-    private String DUPLICATED_ACCOUNTNUMBER;
+    @Value("${responseMessage.EXISTED_ACCOUNT}")
+    private String EXISTED_ACCOUNT;
 
-    @Value("${responseMessage.DUPLICATED_PHONENUMBER}")
-    private String DUPLICATED_PHONENUMBER;
+    @Value("${responseMessage.EXISTED_PHONENUMBER}")
+    private String EXISTED_PHONENUMBER;
 
     @Value("${responseMessage.JOIN_SUCCESS}")
     private String JOIN_SUCCESS;
@@ -53,17 +54,18 @@ public class UserServiceImpl implements UserService {
     @Override
     @ConfigurationProperties("responseMessage")
     public ResponseEntity<DefaultResponse> join(@RequestBody JoinRequestDto joinRequestDto) {
-        return joinAfterCheckDuplication(joinRequestDto);
+        return joinAfterCheckExistence(joinRequestDto);
     }
 
-    private ResponseEntity joinAfterCheckDuplication(JoinRequestDto joinRequestDto) {
-        if(!(userRepository.findByUsername((joinRequestDto.getUsername())).equals(Optional.empty()))){
-            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), DUPLICATED_USERNAME, null), HttpStatus.CONFLICT);
-        }else if(!(userRepository.findByAccountNumber((joinRequestDto.getAccountNumber())).equals(Optional.empty()))){
-            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), DUPLICATED_ACCOUNTNUMBER, null), HttpStatus.CONFLICT);
-        }else if(!(userRepository.findByPhoneNumber((joinRequestDto.getPhoneNumber())).equals(Optional.empty()))){
-            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), DUPLICATED_PHONENUMBER, null), HttpStatus.CONFLICT);
+    private ResponseEntity joinAfterCheckExistence(JoinRequestDto joinRequestDto) {
+        if(!userRepository.findByUsername(joinRequestDto.getUsername()).equals(Optional.empty())){
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), EXISTED_USERNAME, null), HttpStatus.CONFLICT);
+        }else if(!userRepository.findByBankNameAndAccountNumber(joinRequestDto.getBankName(), joinRequestDto.getAccountNumber()).equals(Optional.empty())){
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), EXISTED_ACCOUNT, null), HttpStatus.CONFLICT);
+        }else if(!userRepository.findByPhoneNumber(joinRequestDto.getPhoneNumber()).equals(Optional.empty())){
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), EXISTED_PHONENUMBER, null), HttpStatus.CONFLICT);
         } return joinUser(joinRequestDto);
+
     }
 
     private ResponseEntity joinUser(JoinRequestDto joinRequestDto) {
@@ -74,15 +76,15 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private boolean isDuplicatedPhoneNumber(User user) {
+    private boolean isExistedPhoneNumber(User user) {
         return user != null;
     }
 
-    private boolean isDuplicatedAccountNumber(User user) {
+    private boolean isExistedAccountNumber(User user) {
         return user != null;
     }
 
-    private boolean isDuplicatedUsername(User user) {
+    private boolean isExistedUsername(User user) {
         return user != null;
     }
 
@@ -110,5 +112,9 @@ public class UserServiceImpl implements UserService {
 
     private String getUsernamefromJwtToken(String jwtToken) {
         return JWT.require(Algorithm.HMAC512(JwtProperty.SECRET)).build().verify(jwtToken).getClaim("username").asString();
+    }
+
+    private String getJwtToken(HttpHeaders headers) {
+        return headers.get("Authorization").get(0).replace(JwtProperty.TOKEN_PREFIX, "");
     }
 }

@@ -2,11 +2,11 @@ package tmaxfintech.wf.domain.user.service.impl;
 
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import tmaxfintech.wf.domain.user.dto.JoinRequestDto;
 import tmaxfintech.wf.domain.user.entity.User;
@@ -16,7 +16,7 @@ import tmaxfintech.wf.domain.user.repository.UserRepository;
 import tmaxfintech.wf.domain.user.service.UserService;
 import tmaxfintech.wf.util.jwt.JwtUtility;
 import tmaxfintech.wf.util.response.DefaultResponse;
-import javax.transaction.Transactional;
+
 import java.sql.Timestamp;
 import java.util.Optional;
 
@@ -53,7 +53,6 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    @ConfigurationProperties("responseMessage")
     public ResponseEntity<DefaultResponse> join(@RequestBody JoinRequestDto joinRequestDto) {
         return joinAfterCheckExistence(joinRequestDto);
     }
@@ -66,7 +65,6 @@ public class UserServiceImpl implements UserService {
         }else if(!userRepository.findByPhoneNumber(joinRequestDto.getPhoneNumber()).equals(Optional.empty())){
             return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), EXISTED_PHONENUMBER), HttpStatus.CONFLICT);
         } return joinUser(joinRequestDto);
-
     }
 
     private ResponseEntity joinUser(JoinRequestDto joinRequestDto) {
@@ -77,7 +75,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private User createUser(JoinRequestDto joinRequestDto) {
-        User userEntity = joinRequestDto.ToEntity(joinRequestDto);
+        User userEntity = joinRequestDto.toEntity();
         userEntity.setPasswordandUserRoleTypeandJoinDate(passwordEncoder.encode(joinRequestDto.getPassword()),
                 UserRoleType.ROLE_USER, new Timestamp(System.currentTimeMillis()));
         return userEntity;

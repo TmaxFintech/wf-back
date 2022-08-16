@@ -51,16 +51,16 @@ public class JoinRequestDto {
         return password;
     }
 
-    public User ToEntity(JoinRequestDto joinRequestDto) {
+    public User toEntity() {
         return User.builder()
-                .bankName(joinRequestDto.getBankName())
-                .accountNumber(joinRequestDto.getAccountNumber())
-                .lastName(joinRequestDto.getLastName())
-                .firstName(joinRequestDto.getFirstName())
-                .name(joinRequestDto.getName())
-                .phoneNumber(joinRequestDto.getPhoneNumber())
-                .username(joinRequestDto.getUsername())
-                .password(joinRequestDto.getPassword())
+                .bankName(bankName)
+                .accountNumber(accountNumber)
+                .lastName(lastName)
+                .firstName(firstName)
+                .name(name)
+                .phoneNumber(phoneNumber)
+                .username(username)
+                .password(password)
                 .build();
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import tmaxfintech.wf.config.jwt.JwtProperty;
 import tmaxfintech.wf.domain.user.dto.JoinRequestDto;
@@ -18,7 +19,6 @@ import tmaxfintech.wf.domain.user.service.UserService;
 import tmaxfintech.wf.util.response.DefaultResponse;
 import tmaxfintech.wf.util.response.ResponseMessage;
 
-import javax.transaction.Transactional;
 import java.sql.Timestamp;
 
 @Service
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     private ResponseEntity checkDuplication(JoinRequestDto joinRequestDto) {
         if (isDuplicatedUsername(userRepository.findByUsername(joinRequestDto.getUsername()))) {
             return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), ResponseMessage.DUPLICATED_USERNAME, null), HttpStatus.CONFLICT);
-        } else if (isDuplicatedAccountNumber(userRepository.findByAccountNumber(joinRequestDto.getAccountNumber()))) {
+        } else if (isDuplicatedAccountNumber(userRepository.findByBankNameAndAccountNumber(joinRequestDto.getBankName(), joinRequestDto.getAccountNumber()))) {
             return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), ResponseMessage.DUPLICATED_ACCOUNTNUMBER, null), HttpStatus.CONFLICT);
         } else if (isDuplicatedPhoneNumber(userRepository.findByPhoneNumber(joinRequestDto.getPhoneNumber()))) {
             return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), ResponseMessage.DUPLICATED_PHONENUMBER, null), HttpStatus.CONFLICT);
@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private User createUser(JoinRequestDto joinRequestDto) {
-        User userEntity = joinRequestDto.dtoToEntity(joinRequestDto);
+        User userEntity = joinRequestDto.toEntity();
         userEntity.setPasswordandUserRoleTypeandJoinDate(passwordEncoder.encode(joinRequestDto.getPassword()),
                 UserRoleType.ROLE_USER, new Timestamp(System.currentTimeMillis()));
         return userEntity;

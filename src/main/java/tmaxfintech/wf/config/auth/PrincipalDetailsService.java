@@ -5,7 +5,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import tmaxfintech.wf.domain.user.entity.User;
+import tmaxfintech.wf.exception.UserNotFoundException;
 import tmaxfintech.wf.domain.user.repository.UserRepository;
+
 
 @Service
 public class PrincipalDetailsService implements UserDetailsService {
@@ -18,7 +20,7 @@ public class PrincipalDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User userEntity = userRepository.findByUsername(username);
+        User userEntity = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
         return new PrincipalDetails(userEntity);
     }
 }

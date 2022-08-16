@@ -1,25 +1,24 @@
 package tmaxfintech.wf.domain.user.service.impl;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
+
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
-import tmaxfintech.wf.config.jwt.JwtProperty;
 import tmaxfintech.wf.domain.user.dto.JoinRequestDto;
 import tmaxfintech.wf.domain.user.entity.User;
 import tmaxfintech.wf.domain.user.entity.UserRoleType;
+import tmaxfintech.wf.exception.UserNotFoundException;
 import tmaxfintech.wf.domain.user.repository.UserRepository;
 import tmaxfintech.wf.domain.user.service.UserService;
+import tmaxfintech.wf.util.jwt.JwtUtility;
 import tmaxfintech.wf.util.response.DefaultResponse;
-import tmaxfintech.wf.util.response.ResponseMessage;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -27,50 +26,52 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final JwtUtility jwtUtility;
+
     @Value("${responseMessage.UPDATE_USER_FAIL}")
     private String UPDATE_USER_FAIL;
     @Value("${responseMessage.UPDATE_USER_SUCCESS}")
     private String UPDATE_USER_SUCCESS;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    @Value("${responseMessage.EXISTED_USERNAME}")
+    private String EXISTED_USERNAME;
+
+    @Value("${responseMessage.EXISTED_ACCOUNT}")
+    private String EXISTED_ACCOUNT;
+
+    @Value("${responseMessage.EXISTED_PHONENUMBER}")
+    private String EXISTED_PHONENUMBER;
+
+    @Value("${responseMessage.JOIN_SUCCESS}")
+    private String JOIN_SUCCESS;
+
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtility jwtUtility) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtility = jwtUtility;
     }
 
     @Transactional
     @Override
-    @ConfigurationProperties("responseMessage")
     public ResponseEntity<DefaultResponse> join(@RequestBody JoinRequestDto joinRequestDto) {
-        ResponseEntity responseEntity = checkDuplication(joinRequestDto);
-        if (responseEntity != null) return responseEntity;
+        return joinAfterCheckExistence(joinRequestDto);
+    }
 
+    private ResponseEntity joinAfterCheckExistence(JoinRequestDto joinRequestDto) {
+        if(!userRepository.findByUsername(joinRequestDto.getUsername()).equals(Optional.empty())){
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), EXISTED_USERNAME), HttpStatus.CONFLICT);
+        }else if(!userRepository.findByBankNameAndAccountNumber(joinRequestDto.getBankName(), joinRequestDto.getAccountNumber()).equals(Optional.empty())){
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), EXISTED_ACCOUNT), HttpStatus.CONFLICT);
+        }else if(!userRepository.findByPhoneNumber(joinRequestDto.getPhoneNumber()).equals(Optional.empty())){
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), EXISTED_PHONENUMBER), HttpStatus.CONFLICT);
+        } return joinUser(joinRequestDto);
+    }
+
+    private ResponseEntity joinUser(JoinRequestDto joinRequestDto) {
         User userEntity = createUser(joinRequestDto);
         userRepository.save(userEntity);
 
-        return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), ResponseMessage.JOIN_SUCCESS, null), HttpStatus.OK);
-    }
-
-    private ResponseEntity checkDuplication(JoinRequestDto joinRequestDto) {
-        if (isDuplicatedUsername(userRepository.findByUsername(joinRequestDto.getUsername()))) {
-            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), ResponseMessage.DUPLICATED_USERNAME, null), HttpStatus.CONFLICT);
-        } else if (isDuplicatedAccountNumber(userRepository.findByBankNameAndAccountNumber(joinRequestDto.getBankName(), joinRequestDto.getAccountNumber()))) {
-            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), ResponseMessage.DUPLICATED_ACCOUNTNUMBER, null), HttpStatus.CONFLICT);
-        } else if (isDuplicatedPhoneNumber(userRepository.findByPhoneNumber(joinRequestDto.getPhoneNumber()))) {
-            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), ResponseMessage.DUPLICATED_PHONENUMBER, null), HttpStatus.CONFLICT);
-        }
-        return null;
-    }
-
-    private boolean isDuplicatedPhoneNumber(User user) {
-        return user != null;
-    }
-
-    private boolean isDuplicatedAccountNumber(User user) {
-        return user != null;
-    }
-
-    private boolean isDuplicatedUsername(User user) {
-        return user != null;
+        return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), JOIN_SUCCESS), HttpStatus.OK);
     }
 
     private User createUser(JoinRequestDto joinRequestDto) {
@@ -82,20 +83,20 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public ResponseEntity<DefaultResponse> updatePassword(String jwtToken, String rawPassword) {
-        String username = getUsernamefromJwtToken(jwtToken);
-        User user = userRepository.findByUsername(username);
+        String username = jwtUtility.getUsernameFromJwtToken(jwtToken);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User Not Found"));
         if (isMatchedPassword(rawPassword, user.getPassword())) {
-            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), UPDATE_USER_FAIL, null), HttpStatus.CONFLICT);
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), UPDATE_USER_FAIL), HttpStatus.CONFLICT);
         }
         user.changePassword(passwordEncoder.encode(rawPassword));
-        return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), UPDATE_USER_SUCCESS, null), HttpStatus.OK);
+        return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), UPDATE_USER_SUCCESS), HttpStatus.OK);
     }
 
     private boolean isMatchedPassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
-    private String getUsernamefromJwtToken(String jwtToken) {
-        return JWT.require(Algorithm.HMAC512(JwtProperty.SECRET)).build().verify(jwtToken).getClaim("username").asString();
+    public JwtUtility getJwtUtility() {
+        return jwtUtility;
     }
 }

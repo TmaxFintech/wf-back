@@ -30,7 +30,11 @@ public class User {
 
     private String password;
 
-    public User(Long id, String username, String name, String lastName, String firstName, String bankName, String accountNumber, String phoneNumber, String password, UserRoleType userRoleType, Timestamp joinDate) {
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CoinAccount_id")
+    private CoinAccount coinAccount;
+
+    public User(Long id, String username, String name, String lastName, String firstName, String bankName, String accountNumber, String phoneNumber, String password, CoinAccount coinAccount, UserRoleType userRoleType, Timestamp joinDate) {
         this.id = id;
         this.username = username;
         this.name = name;
@@ -40,6 +44,7 @@ public class User {
         this.accountNumber = accountNumber;
         this.phoneNumber = phoneNumber;
         this.password = password;
+        this.coinAccount = coinAccount;
         this.userRoleType = userRoleType;
         this.joinDate = joinDate;
     }

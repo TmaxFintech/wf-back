@@ -7,7 +7,7 @@ import tmaxfintech.wf.domain.coin.dto.CoinFeignDto;
 
 import java.util.Optional;
 
-@FeignClient(name = "CoinFeignClient", url = "https://www.binance.com/api/v3/ticker/price")
+@FeignClient(name = "CoinFeignClient", url = "https://www.binance.com/api/v3/ticker")
 public interface CoinFeignClient {
 
     @GetMapping

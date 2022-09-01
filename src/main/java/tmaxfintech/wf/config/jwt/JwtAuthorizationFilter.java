@@ -41,7 +41,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+        String requestURI = request.getRequestURI();
         String jwtHeader = request.getHeader(JwtProperty.HEADER_STRING);
+
+        if (requestURI.startsWith("/users") && jwtHeader == null) response.sendError(401,"회원 인증 실패");
+
         if (jwtHeader == null || !jwtHeader.startsWith(JwtProperty.TOKEN_PREFIX)) {
             chain.doFilter(request, response);
             return;

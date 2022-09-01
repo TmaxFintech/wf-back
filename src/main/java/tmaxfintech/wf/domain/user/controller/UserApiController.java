@@ -36,13 +36,10 @@ public class UserApiController {
         return userService.updatePassword(jwtToken, updateRequestDto.getPassword());
     }
 
-    @GetMapping("/user")
-    public String user() {
-        return "user";
+    @GetMapping("/users")
+    public ResponseEntity<DefaultResponse> getUserInfo(@RequestHeader HttpHeaders headers){
+        String jwtToken = jwtUtility.getJwtTokenFromHeader(headers);
+        return userService.getUserInfo(jwtToken);
     }
 
-    @GetMapping("/admin")
-    public String admin() {
-        return "admin";
-    }
 }

@@ -32,7 +32,7 @@ public class CandleScheduler {
         this.candleService = candleService;
     }
 
-    @Scheduled(cron = "0 0/1 * * * *")
+    @Scheduled(cron = "1 0/1 * * * *")
     public void saveCandle() {
         candleService.saveCandle(symbolBtcusdt, interval, limit);
         candleService.saveCandle(symbolEthusdt, interval, limit);

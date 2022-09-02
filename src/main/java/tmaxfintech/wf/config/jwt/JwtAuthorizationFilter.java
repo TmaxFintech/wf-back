@@ -44,7 +44,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String requestURI = request.getRequestURI();
         String jwtHeader = request.getHeader(JwtProperty.HEADER_STRING);
 
-        if (requestURI.startsWith("/users") && jwtHeader == null) response.sendError(401,"회원 인증 실패");
+        if (requestURI.startsWith("/users") && jwtHeader == null && !requestURI.equals("/users/join")) response.sendError(401,"회원 인증 실패");
 
         if (jwtHeader == null || !jwtHeader.startsWith(JwtProperty.TOKEN_PREFIX)) {
             chain.doFilter(request, response);

@@ -1,8 +1,10 @@
 package tmaxfintech.wf.domain.coin.dto;
 
-import tmaxfintech.wf.domain.coin.entity.Coin;
+import lombok.Builder;
 
-public class CoinFeignDto {
+@Builder
+public class CoinResponseDto {
+
     private String symbol;
 
     private Double priceChange;
@@ -21,19 +23,16 @@ public class CoinFeignDto {
 
     private Double volume;
 
-    private Double quoteVolume;
-
-    private Long openTime;
-
-    private Long closeTime;
-
-    private Long firstId;
-
-    private Long lastId;
-
-    private Long count;
-
-    protected CoinFeignDto() {
+    public CoinResponseDto(String symbol, Double priceChange, Double priceChangePercent, Double weightedAvgPrice, Double openPrice, Double highPrice, Double lowPrice, Double lastPrice, Double volume) {
+        this.symbol = symbol;
+        this.priceChange = priceChange;
+        this.priceChangePercent = priceChangePercent;
+        this.weightedAvgPrice = weightedAvgPrice;
+        this.openPrice = openPrice;
+        this.highPrice = highPrice;
+        this.lowPrice = lowPrice;
+        this.lastPrice = lastPrice;
+        this.volume = volume;
     }
 
     public String getSymbol() {
@@ -70,29 +69,5 @@ public class CoinFeignDto {
 
     public Double getVolume() {
         return volume;
-    }
-
-    public Double getQuoteVolume() {
-        return quoteVolume;
-    }
-
-    public Long getOpenTime() {
-        return openTime;
-    }
-
-    public Long getCloseTime() {
-        return closeTime;
-    }
-
-    public Long getFirstId() {
-        return firstId;
-    }
-
-    public Long getLastId() {
-        return lastId;
-    }
-
-    public Long getCount() {
-        return count;
     }
 }

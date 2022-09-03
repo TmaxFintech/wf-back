@@ -90,23 +90,10 @@ public class CoinFeignDto {
 
     public Long getLastId() {
         return lastId;
+
     }
 
     public Long getCount() {
         return count;
-    }
-
-    public Coin toEntity() {
-        return Coin.builder()
-                .symbol(symbol)
-                .priceChange(priceChange)
-                .priceChangePercent(priceChangePercent)
-                .weightedAvgPrice(weightedAvgPrice)
-                .openPrice(openPrice)
-                .highPrice(highPrice)
-                .lowPrice(lowPrice)
-                .lastPrice(lastPrice)
-                .volume(volume)
-                .build();
     }
 }

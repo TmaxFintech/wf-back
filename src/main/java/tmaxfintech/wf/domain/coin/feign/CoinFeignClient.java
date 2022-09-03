@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface CoinFeignClient {
 
     @GetMapping
-    Optional<CoinFeignDto> getCoin(@RequestParam(value="symbol") String symbol);
+    Optional<CoinFeignDto> getCoinFeignDto(@RequestParam(value="symbol") String symbol);
 }

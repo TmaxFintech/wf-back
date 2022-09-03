@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface CandleFeignClient {
 
     @GetMapping
-    Optional<List<List<String>>> getCandle2dList(@RequestParam(value="symbol") String symbol, @RequestParam(value="interval") String interval, @RequestParam(value="limit") Integer limit);
+    Optional<List<List<String>>> getStringCandle2dList(@RequestParam(value="symbol") String symbol, @RequestParam(value="interval") String interval, @RequestParam(value="limit") Integer limit);
 }

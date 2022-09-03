@@ -2,6 +2,7 @@ package tmaxfintech.wf.domain.coin.entity;
 
 import lombok.Builder;
 import org.springframework.beans.factory.annotation.Value;
+
 import tmaxfintech.wf.domain.coin.dto.CoinFeignDto;
 import tmaxfintech.wf.domain.coin.dto.CoinResponseDto;
 

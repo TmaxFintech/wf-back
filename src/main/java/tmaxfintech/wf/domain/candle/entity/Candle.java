@@ -1,13 +1,14 @@
 package tmaxfintech.wf.domain.candle.entity;
 
 import lombok.Builder;
+import lombok.ToString;
+import tmaxfintech.wf.domain.candle.dto.CandleResponseDto;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Builder
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"openTime", "intervals", "symbol"})})
 public class Candle {
 
     @Id
@@ -38,10 +39,14 @@ public class Candle {
 
     private Double ignores;
 
+    private String symbol;
+
+    private String intervals;
+
     protected Candle() {
     }
 
-    public Candle(Long id, Long openTime, Double openPrice, Double highPrice, Double lowPrice, Double closePrice, Double volume, Long closeTime, Double quoteAssetVolume, Long numberOfTrades, Double takerBuyBaseAssetVolume, Double takerBuyQuoteAssetVolume, Double ignores) {
+    public Candle(Long id, Long openTime, Double openPrice, Double highPrice, Double lowPrice, Double closePrice, Double volume, Long closeTime, Double quoteAssetVolume, Long numberOfTrades, Double takerBuyBaseAssetVolume, Double takerBuyQuoteAssetVolume, Double ignores, String symbol, String intervals) {
         this.id = id;
         this.openTime = openTime;
         this.openPrice = openPrice;
@@ -55,53 +60,21 @@ public class Candle {
         this.takerBuyBaseAssetVolume = takerBuyBaseAssetVolume;
         this.takerBuyQuoteAssetVolume = takerBuyQuoteAssetVolume;
         this.ignores = ignores;
+        this.symbol = symbol;
+        this.intervals = intervals;
     }
 
-    public Long getOpenTime() {
-        return openTime;
-    }
-
-    public Double getOpenPrice() {
-        return openPrice;
-    }
-
-    public Double getHighPrice() {
-        return highPrice;
-    }
-
-    public Double getLowPrice() {
-        return lowPrice;
-    }
-
-    public Double getClosePrice() {
-        return closePrice;
-    }
-
-    public Double getVolume() {
-        return volume;
-    }
-
-    public Long getCloseTime() {
-        return closeTime;
-    }
-
-    public Double getQuoteAssetVolume() {
-        return quoteAssetVolume;
-    }
-
-    public Long getNumberOfTrades() {
-        return numberOfTrades;
-    }
-
-    public Double getTakerBuyBaseAssetVolume() {
-        return takerBuyBaseAssetVolume;
-    }
-
-    public Double getTakerBuyQuoteAssetVolume() {
-        return takerBuyQuoteAssetVolume;
-    }
-
-    public Double getIgnores() {
-        return ignores;
+    public CandleResponseDto toDto() {
+        return CandleResponseDto.builder()
+                .openTime(openTime)
+                .openPrice(openPrice)
+                .highPrice(highPrice)
+                .lowPrice(lowPrice)
+                .closePrice(closePrice)
+                .volume(volume)
+                .closeTime(closeTime)
+                .symbol(symbol)
+                .intervals(intervals)
+                .build();
     }
 }

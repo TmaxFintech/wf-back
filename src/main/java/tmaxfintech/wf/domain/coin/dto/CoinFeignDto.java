@@ -90,6 +90,7 @@ public class CoinFeignDto {
 
     public Long getLastId() {
         return lastId;
+
     }
 
     public Long getCount() {

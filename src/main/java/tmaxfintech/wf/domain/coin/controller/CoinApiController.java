@@ -16,6 +16,7 @@ public class CoinApiController {
 
     private final CoinService coinService;
 
+
     @Value("${responseMessage.SELECT_COIN_SUCCESS}")
     private String SELECT_COIN_SUCCESS;
 

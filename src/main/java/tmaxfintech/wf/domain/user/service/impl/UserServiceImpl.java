@@ -8,6 +8,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
+import tmaxfintech.wf.domain.coinAccount.entity.CoinAccount;
+import tmaxfintech.wf.domain.coinAccount.service.CoinAccountService;
 import tmaxfintech.wf.domain.user.dto.JoinRequestDto;
 import tmaxfintech.wf.domain.user.entity.User;
 import tmaxfintech.wf.domain.user.entity.UserRoleType;
@@ -25,6 +27,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    private final CoinAccountService coinAccountService;
 
     private final JwtUtility jwtUtility;
 
@@ -45,9 +49,10 @@ public class UserServiceImpl implements UserService {
     @Value("${responseMessage.JOIN_SUCCESS}")
     private String JOIN_SUCCESS;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtility jwtUtility) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, CoinAccountService coinAccountService, JwtUtility jwtUtility) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.coinAccountService = coinAccountService;
         this.jwtUtility = jwtUtility;
     }
 
@@ -68,17 +73,26 @@ public class UserServiceImpl implements UserService {
     }
 
     private ResponseEntity joinUser(JoinRequestDto joinRequestDto) {
-        User userEntity = createUser(joinRequestDto);
-        userRepository.save(userEntity);
-
+        User user = createUser(joinRequestDto, coinAccountService.createCoinAccount(), passwordEncoder.encode(joinRequestDto.getPassword()),
+                UserRoleType.ROLE_USER, new Timestamp(System.currentTimeMillis()));
+        userRepository.save(user);
         return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), JOIN_SUCCESS), HttpStatus.OK);
     }
 
-    private User createUser(JoinRequestDto joinRequestDto) {
-        User userEntity = joinRequestDto.toEntity();
-        userEntity.setPasswordandUserRoleTypeandJoinDate(passwordEncoder.encode(joinRequestDto.getPassword()),
-                UserRoleType.ROLE_USER, new Timestamp(System.currentTimeMillis()));
-        return userEntity;
+    public User createUser(JoinRequestDto joinRequestDto, CoinAccount coinAccount, String password, UserRoleType userRoleType, Timestamp joinDate) {
+        return User.builder()
+                .username(joinRequestDto.getUsername())
+                .name(joinRequestDto.getName())
+                .lastName(joinRequestDto.getLastName())
+                .firstName(joinRequestDto.getFirstName())
+                .bankName(joinRequestDto.getBankName())
+                .accountNumber(joinRequestDto.getAccountNumber())
+                .phoneNumber(joinRequestDto.getPhoneNumber())
+                .password(password)
+                .coinAccount(coinAccount)
+                .userRoleType(userRoleType)
+                .joinDate(joinDate)
+                .build();
     }
 
     @Transactional

@@ -3,6 +3,7 @@ package tmaxfintech.wf.domain.user.entity;
 import lombok.Builder;
 import org.hibernate.annotations.CreationTimestamp;
 import tmaxfintech.wf.domain.user.dto.LoginResponseDto;
+import tmaxfintech.wf.domain.user.dto.GetUserInfoRequestDto;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -93,5 +94,17 @@ public class User {
 
     public LoginResponseDto toLoginResponseDto() {
         return new LoginResponseDto(name);
+    }
+
+    public GetUserInfoRequestDto toGetUserInfoRequestDto() {
+        return GetUserInfoRequestDto.builder()
+                .username(username)
+                .name(name)
+                .firstName(firstName)
+                .lastName(lastName)
+                .phoneNumber(phoneNumber)
+                .bankName(bankName)
+                .accountNumber(accountNumber)
+                .build();
     }
 }

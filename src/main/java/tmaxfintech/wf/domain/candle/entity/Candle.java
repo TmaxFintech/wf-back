@@ -1,7 +1,6 @@
 package tmaxfintech.wf.domain.candle.entity;
 
 import lombok.Builder;
-import lombok.ToString;
 import tmaxfintech.wf.domain.candle.dto.CandleResponseDto;
 
 import javax.persistence.*;

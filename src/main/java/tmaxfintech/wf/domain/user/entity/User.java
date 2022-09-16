@@ -2,6 +2,7 @@ package tmaxfintech.wf.domain.user.entity;
 
 import lombok.Builder;
 import org.hibernate.annotations.CreationTimestamp;
+import tmaxfintech.wf.domain.coinAccount.entity.CoinAccount;
 import tmaxfintech.wf.domain.user.dto.LoginResponseDto;
 import tmaxfintech.wf.domain.user.dto.GetUserInfoRequestDto;
 
@@ -31,7 +32,11 @@ public class User {
 
     private String password;
 
-    public User(Long id, String username, String name, String lastName, String firstName, String bankName, String accountNumber, String phoneNumber, String password, UserRoleType userRoleType, Timestamp joinDate) {
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "coinAccount_id")
+    private CoinAccount coinAccount;
+
+    public User(Long id, String username, String name, String lastName, String firstName, String bankName, String accountNumber, String phoneNumber, String password, CoinAccount coinAccount, UserRoleType userRoleType, Timestamp joinDate) {
         this.id = id;
         this.username = username;
         this.name = name;
@@ -41,6 +46,7 @@ public class User {
         this.accountNumber = accountNumber;
         this.phoneNumber = phoneNumber;
         this.password = password;
+        this.coinAccount = coinAccount;
         this.userRoleType = userRoleType;
         this.joinDate = joinDate;
     }
@@ -67,29 +73,17 @@ public class User {
         return userRoleType;
     }
 
-    public User() {
+    protected User() {
     }
 
-    public void setJoinDate(Timestamp joinDate) {
+    public void setPasswordAndUserRoleTypeAndJoinDate(String password, UserRoleType userRoleType, Timestamp joinDate) {
+        this.password = password;
+        this.userRoleType = userRoleType;
         this.joinDate = joinDate;
     }
 
-    public void setUserRoleType(UserRoleType userRoleType) {
-        this.userRoleType = userRoleType;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setPasswordandUserRoleTypeandJoinDate(String password, UserRoleType userRoleType, Timestamp joinDate) {
-        setPassword(password);
-        setUserRoleType(userRoleType);
-        setJoinDate(joinDate);
-    }
-
     public void changePassword(String password) {
-        setPassword(password);
+        this.password = password;
     }
 
     public LoginResponseDto toLoginResponseDto() {

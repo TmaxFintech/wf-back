@@ -49,7 +49,13 @@ public class UserServiceImpl implements UserService {
     @Value("${responseMessage.JOIN_SUCCESS}")
     private String JOIN_SUCCESS;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, CoinAccountService coinAccountService, JwtUtility jwtUtility) {
+    @Value("${responseMessage.GET_USER_INFO_SUCCESS}")
+    private String GET_USER_INFO_SUCCESS;
+
+    @Value("${responseMessage.GET_USER_INFO_FAIL}")
+    private String GET_USER_INFO_FAIL;
+
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, CoinAccountService coinAccountService, JwtUtility jwtUtility) {=
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.coinAccountService = coinAccountService;
@@ -112,5 +118,14 @@ public class UserServiceImpl implements UserService {
 
     public JwtUtility getJwtUtility() {
         return jwtUtility;
+    }
+
+    public ResponseEntity<DefaultResponse> getUserInfo(String jwtToken){
+        String username = jwtUtility.getUsernameFromJwtToken(jwtToken);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User Not Found"));
+        if (userRepository.findByUsername(username).equals(Optional.empty())){
+            return new ResponseEntity(DefaultResponse.response(HttpStatus.CONFLICT.value(), GET_USER_INFO_FAIL), HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), GET_USER_INFO_SUCCESS, user.toGetUserInfoRequestDto()), HttpStatus.OK);
     }
 }

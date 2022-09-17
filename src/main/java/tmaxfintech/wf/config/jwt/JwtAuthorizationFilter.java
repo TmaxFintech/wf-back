@@ -2,6 +2,8 @@ package tmaxfintech.wf.config.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,15 +25,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private UserRepository userRepository;
 
-//    @Autowired
-//    private JwtUtility jwtUtility;
-
     private final JwtUtility jwtUtility;
 
-//    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
-//        super(authenticationManager);
-//        this.userRepository = userRepository;
-//    }
+    @Value("${responseMessage.UNAUTHORIZED}")
+    private String UNAUTHORIZED;
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository, JwtUtility jwtUtility) {
         super(authenticationManager);
@@ -44,15 +41,21 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String requestURI = request.getRequestURI();
         String jwtHeader = request.getHeader(JwtProperty.HEADER_STRING);
 
-        if (requestURI.startsWith("/users") && jwtHeader == null && !requestURI.equals("/users/join")) response.sendError(401,"회원 인증 실패");
-
-        if (jwtHeader == null || !jwtHeader.startsWith(JwtProperty.TOKEN_PREFIX)) {
+        if (jwtHeader == null) {
+            if (requestURI.startsWith(("/users")) && !requestURI.equals("/users/join") || requestURI.equals("/orders")) {
+                response.sendError(HttpStatus.UNAUTHORIZED.value(), UNAUTHORIZED);
+            }
             chain.doFilter(request, response);
             return;
         }
 
-        String jwtToken = request.getHeader(JwtProperty.HEADER_STRING).replace(JwtProperty.TOKEN_PREFIX, "");
-        String username = JWT.require(Algorithm.HMAC512(JwtProperty.SECRET)).build().verify(jwtToken).getClaim("username").asString();
+        String jwtToken = request.getHeader(JwtProperty.HEADER_STRING);
+        String username = null;
+        try {
+            username = JWT.require(Algorithm.HMAC512(JwtProperty.SECRET)).build().verify(jwtToken).getClaim("username").asString();
+        } catch (Exception e) {
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), UNAUTHORIZED);
+        }
         if (username != null) {
             User userEntity = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
             PrincipalDetails principalDetails = new PrincipalDetails(userEntity);

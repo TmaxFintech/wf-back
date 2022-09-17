@@ -1,25 +1,23 @@
 package tmaxfintech.wf.domain.holdingCoin.dto;
 
 import lombok.Builder;
-import tmaxfintech.wf.domain.coin.dto.CoinResponseDto;
 
 @Builder
 public class HoldingCoinResponseDto {
 
-    private CoinResponseDto coinResponseDto;
-
+    private String symbol;
     private Double quantity;
 
     private Double totalPurchasePrice;
 
-    public HoldingCoinResponseDto(CoinResponseDto coinResponseDto, Double quantity, Double totalPurchasePrice) {
-        this.coinResponseDto = coinResponseDto;
+    public HoldingCoinResponseDto(String symbol, Double quantity, Double totalPurchasePrice) {
+        this.symbol = symbol;
         this.quantity = quantity;
         this.totalPurchasePrice = totalPurchasePrice;
     }
 
-    public CoinResponseDto getCoinResponseDto() {
-        return coinResponseDto;
+    public String getSymbol() {
+        return symbol;
     }
 
     public Double getQuantity() {

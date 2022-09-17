@@ -1,8 +1,6 @@
 package tmaxfintech.wf.domain.coin.service;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,7 +10,6 @@ import tmaxfintech.wf.domain.coin.entity.Coin;
 import tmaxfintech.wf.domain.coin.feign.CoinFeignClient;
 import tmaxfintech.wf.domain.coin.repository.CoinRepository;
 import tmaxfintech.wf.exception.BinanceCoinApiException;
-import tmaxfintech.wf.util.response.DefaultResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,12 +29,12 @@ public class CoinService {
     }
 
     public CoinFeignDto getCoinFeignDto(String symbol) {
-        return coinFeignClient.getCoinFeignDto(symbol).orElseThrow(() -> new BinanceCoinApiException());
+        return coinFeignClient.getCoinFeignDto(symbol).orElseThrow(BinanceCoinApiException::new);
     }
 
     @Transactional
     public void updateCoin(String symbol) {
-        Coin coin = coinRepository.findBySymbol(symbol).orElseThrow(() -> new BinanceCoinApiException());
+        Coin coin = coinRepository.findBySymbol(symbol).orElseThrow(BinanceCoinApiException::new);
 
         coin.updateCoin(getCoinFeignDto(symbol));
     }
@@ -45,8 +42,7 @@ public class CoinService {
     @Transactional(readOnly = true)
     public List<CoinResponseDto> selectCoins() {
         List<Coin> coins = coinRepository.findAll();
-        if (coins == null || coins.isEmpty()) throw new BinanceCoinApiException();
-        List<CoinResponseDto> coinResponseDtos = coins.stream().map(Coin::toDto).collect(Collectors.toList());
-        return coinResponseDtos;
+        if (coins.isEmpty()) throw new BinanceCoinApiException();
+        return coins.stream().map(Coin::toDto).collect(Collectors.toList());
     }
 }

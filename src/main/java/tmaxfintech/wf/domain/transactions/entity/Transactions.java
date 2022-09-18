@@ -36,7 +36,7 @@ public class Transactions {
         this.coinAccount = coinAccount;
         this.price = price;
     }
-
+    
     public TransactionsResponseDto toDto() {
         return TransactionsResponseDto.builder()
             .symbol(symbol)

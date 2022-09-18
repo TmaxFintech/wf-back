@@ -1,6 +1,5 @@
 package tmaxfintech.wf.domain.holdingCoin.entity;
 
-import tmaxfintech.wf.domain.coin.entity.Coin;
 import tmaxfintech.wf.domain.coinAccount.entity.CoinAccount;
 import tmaxfintech.wf.domain.holdingCoin.dto.HoldingCoinResponseDto;
 
@@ -13,8 +12,7 @@ public class HoldingCoin {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private Coin coin;
+    private String symbol;
 
     private Double quantity;
 
@@ -23,15 +21,42 @@ public class HoldingCoin {
     protected HoldingCoin() {
     }
 
+    public HoldingCoin(String symbol, Double quantity, Double totalPurchasePrice, CoinAccount coinAccount) {
+        this.symbol = symbol;
+        this.quantity = quantity;
+        this.totalPurchasePrice = totalPurchasePrice;
+        this.coinAccount = coinAccount;
+    }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coinAccount_id")
     private CoinAccount coinAccount;
 
     public HoldingCoinResponseDto toDto() {
         return HoldingCoinResponseDto.builder()
-                .coinResponseDto(coin.toDto())
+                .symbol(symbol)
                 .quantity(quantity)
                 .totalPurchasePrice(totalPurchasePrice)
                 .build();
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public Double getQuantity() {
+        return quantity;
+    }
+
+    public Double getTotalPurchasePrice() {
+        return totalPurchasePrice;
+    }
+
+    public void changeQuantity(Double quantity) {
+        this.quantity = quantity;
+    }
+
+    public void changeTotalPurchasePrice(Double totalPurchasePrice) {
+        this.totalPurchasePrice = totalPurchasePrice;
     }
 }

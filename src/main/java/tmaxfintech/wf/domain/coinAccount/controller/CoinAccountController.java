@@ -4,9 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import tmaxfintech.wf.domain.coinAccount.dto.OrderRequestDto;
 import tmaxfintech.wf.domain.coinAccount.service.CoinAccountService;
 import tmaxfintech.wf.util.jwt.JwtUtility;
 import tmaxfintech.wf.util.response.DefaultResponse;
@@ -30,5 +29,11 @@ public class CoinAccountController {
     public ResponseEntity<DefaultResponse> retrieveCoinAccountDto(@RequestHeader HttpHeaders headers) {
         String username = jwtUtility.getUsernameFromJwtToken(jwtUtility.getJwtTokenFromHeader(headers));
         return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), SELECT_COINACCOUNT_SUCCESS, coinAccountService.retrieveCoinAccountDto(username)), HttpStatus.OK);
+    }
+
+    @PutMapping("/orders")
+    public ResponseEntity<DefaultResponse> orderCoins(@RequestHeader HttpHeaders headers, @RequestBody OrderRequestDto orderRequestDto) {
+        String username = jwtUtility.getUsernameFromJwtToken(jwtUtility.getJwtTokenFromHeader(headers));
+        return coinAccountService.orderCoins(username, orderRequestDto);
     }
 }

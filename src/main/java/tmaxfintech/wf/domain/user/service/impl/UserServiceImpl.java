@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
     @Value("${responseMessage.GET_USER_INFO_FAIL}")
     private String GET_USER_INFO_FAIL;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, CoinAccountService coinAccountService, JwtUtility jwtUtility) {=
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, CoinAccountService coinAccountService, JwtUtility jwtUtility) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.coinAccountService = coinAccountService;

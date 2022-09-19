@@ -37,4 +37,16 @@ public class CoinAccount {
                 .holdingCoinResponseDtos(holdingCoins.stream().map(HoldingCoin::toDto).collect(Collectors.toList()))
                 .build();
     }
+
+    public Double getCash() {
+        return cash;
+    }
+
+    public List<HoldingCoin> getHoldingCoins() {
+        return holdingCoins;
+    }
+
+    public void changeCash(Double cash) {
+        this.cash = cash;
+    }
 }

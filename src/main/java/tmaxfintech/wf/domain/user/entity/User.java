@@ -73,13 +73,11 @@ public class User {
         return userRoleType;
     }
 
-    protected User() {
+    public CoinAccount getCoinAccount() {
+        return coinAccount;
     }
 
-    public void setPasswordAndUserRoleTypeAndJoinDate(String password, UserRoleType userRoleType, Timestamp joinDate) {
-        this.password = password;
-        this.userRoleType = userRoleType;
-        this.joinDate = joinDate;
+    protected User() {
     }
 
     public void changePassword(String password) {

@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import tmaxfintech.wf.domain.coin.service.CoinService;
 import tmaxfintech.wf.util.response.DefaultResponse;
 
@@ -11,7 +13,6 @@ import tmaxfintech.wf.util.response.DefaultResponse;
 public class CoinApiController {
 
     private final CoinService coinService;
-
 
     @Value("${responseMessage.SELECT_COIN_SUCCESS}")
     private String SELECT_COIN_SUCCESS;

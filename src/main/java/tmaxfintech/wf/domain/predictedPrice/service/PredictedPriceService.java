@@ -22,10 +22,10 @@ public class PredictedPriceService {
     }
 
     @Transactional
-    public ResponseEntity<DefaultResponse> updatePredictedPrice(String symbol, Double predictedPrice) {
+    public ResponseEntity<DefaultResponse> updatePredictedPrice(String symbol, Double predictedPrice,String interval) {
 
         PredictedPrice predictedprice = predictedPriceRepository.findBySymbol(symbol).get();
-        predictedprice.updatePredictedPrice(symbol,predictedPrice);
+        predictedprice.updatePredictedPrice(symbol,predictedPrice, interval);
 
         return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), PREDICTED_PRICE_UPDATE_SUCCESS), HttpStatus.OK);
     }

@@ -19,7 +19,6 @@ public class PredictedPriceController {
 
     @PutMapping("/coins/predict")
     public ResponseEntity<DefaultResponse> updatePredictedPrice(@RequestBody PredictedPriceRequestDto predictedPriceRequestDto) {
-//        System.out.println(predictedPriceRequestDto);
-        return predictedPriceService.updatePredictedPrice(predictedPriceRequestDto.getSymbol(), predictedPriceRequestDto.getPredictedPrice());
+        return predictedPriceService.updatePredictedPrice(predictedPriceRequestDto.getSymbol(), predictedPriceRequestDto.getPredictedPrice(), predictedPriceRequestDto.getIntervals());
     }
 }

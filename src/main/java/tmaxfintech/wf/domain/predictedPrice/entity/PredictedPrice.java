@@ -14,22 +14,25 @@ public class PredictedPrice {
 
     private String symbol;
     private Double predictedPrice;
+    private String intervals;
 
     protected PredictedPrice(){
 
     }
 
-    public PredictedPrice(String symbol, Double predictedPrice){
+    public PredictedPrice(String symbol, Double predictedPrice, String intervals){
         this.symbol = symbol;
         this.predictedPrice = predictedPrice;
+        this.intervals = intervals;
     }
 
     public String getSymbol(){return symbol;}
     public Double getPredictedPrice(){return predictedPrice;}
 
-    public void updatePredictedPrice(String symbol, Double predictedPrice){
+    public void updatePredictedPrice(String symbol, Double predictedPrice, String intervals){
         this.symbol = symbol;
         this.predictedPrice = predictedPrice;
+        this.intervals = intervals;
     }
 
 }

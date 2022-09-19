@@ -27,7 +27,7 @@ public class TransactionsService {
     @Value("${coinResponse.side.buy}")
     private String BUY;
 
-    @Value("${ResponseMessage.USER_NOT_FOUND}")
+    @Value("${responseMessage.USER_NOT_FOUND}")
 
     private String USER_NOT_FOUND;
 

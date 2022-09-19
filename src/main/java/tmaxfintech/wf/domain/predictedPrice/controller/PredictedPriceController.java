@@ -19,4 +19,9 @@ public class PredictedPriceController {
     public ResponseEntity<DefaultResponse> updatePredictedPrice(@RequestBody PredictedPriceRequestDto predictedPriceRequestDto) {
         return predictedPriceService.updatePredictedPrice(predictedPriceRequestDto.getSymbol(), predictedPriceRequestDto.getPredictedPrice(), predictedPriceRequestDto.getIntervals());
     }
+
+    @GetMapping("/coins/predict")
+    public ResponseEntity<DefaultResponse> getPredictedPrice(@RequestParam(required = false) String symbol, @RequestParam String intervals) {
+        return predic
+    }
 }

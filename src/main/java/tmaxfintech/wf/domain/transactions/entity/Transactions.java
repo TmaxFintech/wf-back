@@ -1,6 +1,7 @@
 package tmaxfintech.wf.domain.transactions.entity;
 
 import tmaxfintech.wf.domain.coinAccount.entity.CoinAccount;
+import tmaxfintech.wf.domain.transactions.dto.TransactionsResponseDto;
 
 import javax.persistence.*;
 
@@ -34,5 +35,15 @@ public class Transactions {
         this.side = side;
         this.coinAccount = coinAccount;
         this.price = price;
+    }
+    
+    public TransactionsResponseDto toDto() {
+        return TransactionsResponseDto.builder()
+            .symbol(symbol)
+            .volume(volume)
+            .tradingTime(tradingTime)
+            .side(side)
+            .price(price)
+            .build();
     }
 }

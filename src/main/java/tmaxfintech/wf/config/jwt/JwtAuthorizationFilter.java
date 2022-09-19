@@ -42,7 +42,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String jwtHeader = request.getHeader(JwtProperty.HEADER_STRING);
 
         if (jwtHeader == null) {
-            if (requestURI.startsWith(("/users")) && !requestURI.equals("/users/join") || requestURI.equals("/orders")) {
+            if ((requestURI.startsWith(("/users")) && !requestURI.equals("/users/join")) || requestURI.equals("/orders")
+                    || requestURI.equals("/transactions")) {
                 response.sendError(HttpStatus.UNAUTHORIZED.value(), UNAUTHORIZED);
             }
             chain.doFilter(request, response);

@@ -27,13 +27,14 @@ public class TransactionsService {
     @Value("${coinResponse.side.buy}")
     private String BUY;
 
-    @Value("${ResponseMessage.USER_NOT_FOUND}")
+    @Value("${responseMessage.USER_NOT_FOUND}")
     private String USER_NOT_FOUND;
 
     public TransactionsService(TransactionsRepository transactionsRepository, UserRepository userRepository) {
         this.transactionsRepository = transactionsRepository;
         this.userRepository = userRepository;
     }
+
 
     public Page<TransactionsResponseDto> retrieveTransactionsPage(String side, Pageable pageable, String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));

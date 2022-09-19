@@ -1,5 +1,7 @@
 package tmaxfintech.wf.domain.predictedPrice.entity;
 
+import tmaxfintech.wf.domain.predictedPrice.dto.PredictedPriceResponseDto;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -35,4 +37,7 @@ public class PredictedPrice {
         this.intervals = intervals;
     }
 
+    public PredictedPriceResponseDto toDto() {
+        return new PredictedPriceResponseDto(symbol, predictedPrice, intervals);
+    }
 }

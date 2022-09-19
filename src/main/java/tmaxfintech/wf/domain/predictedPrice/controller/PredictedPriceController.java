@@ -1,9 +1,7 @@
 package tmaxfintech.wf.domain.predictedPrice.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tmaxfintech.wf.domain.predictedPrice.dto.PredictedPriceRequestDto;
 import tmaxfintech.wf.domain.predictedPrice.service.PredictedPriceService;
 import tmaxfintech.wf.util.response.DefaultResponse;

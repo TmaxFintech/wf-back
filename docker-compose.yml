@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  wf-back:
+    build:
+      context: .
+    container_name: wf-back
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+      - SPRING_DATASOURCE_URL=jdbc:mysql://wf-back:3306/wf?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
+    networks:
+      - wf
+    depends_on:
+      - wf-back
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+  kimgoding-mysql:
+    image: mysql
+    container_name: wf-back
+    environment:
+      - MYSQL_DATABASE=wf-back
+      - MYSQL_ROOT_PASSWORD=tmaxfintech
+      - TZ=Asia/Seoul
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+    networks:
+      - wf
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - data:/var/lib/mysql
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+volumes:
+  data:
+networks:
+  wf:

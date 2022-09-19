@@ -1,39 +1,14 @@
-version: "3.9"
-services:
-  wf-back:
-    build:
-      context: .
-    container_name: wf-back
-    environment:
-      - SPRING_PROFILES_ACTIVE=local
-      - SPRING_DATASOURCE_URL=jdbc:mysql://wf-back:3306/wf?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
-    networks:
-      - wf
-    depends_on:
-      - wf-back
-    restart: unless-stopped
-    ports:
-      - 8080:8080
-  kimgoding-mysql:
-    image: mysql
-    container_name: wf-back
-    environment:
-      - MYSQL_DATABASE=wf-back
-      - MYSQL_ROOT_PASSWORD=tmaxfintech
-      - TZ=Asia/Seoul
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=root
-    networks:
-      - wf
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - data:/var/lib/mysql
-    restart: unless-stopped
-    ports:
-      - 3306:3306
-volumes:
-  data:
-networks:
-  wf:
+version: "3" # 버전 지정
+
+services: # 컨테이너 설정
+  db:
+    container_name: wf_back
+    image: mysql # 컨테이너에서 사용하는 base image 지정
+    restart: always # 컨테이너 다운 시 재시작하라는 명령어
+    volumes: # -v 옵션과 동일
+      - ./mysqldata:/var/lib/mysql
+    environment: # 컨테이너 안의 환경변수 설정
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=wf_back
+    ports: # -p 옵션과 동일
+      - "3306:3306"

@@ -12,6 +12,7 @@ import tmaxfintech.wf.domain.user.entity.User;
 import tmaxfintech.wf.domain.user.repository.UserRepository;
 import tmaxfintech.wf.exception.UserNotFoundException;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,10 +40,10 @@ public class TransactionsService {
     public Page<TransactionsResponseDto> retrieveTransactionsPage(String side, Pageable pageable, String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
         if (side != null) {
-            return new PageImpl<>(transactionsRepository.findAllByCoinAccountAndSide(pageable, user.getCoinAccount(),
-                    side).stream().map(Transactions::toDto).collect(Collectors.toList()));
+            Page<Transactions> transactions = transactionsRepository.findAllByCoinAccountAndSide(pageable, user.getCoinAccount(), side);
+            return new PageImpl<>(transactions.stream().map(Transactions::toDto).collect(Collectors.toList()), pageable, transactions.getTotalElements());
         }
-        return new PageImpl<>(transactionsRepository.findAllByCoinAccount(pageable, user.getCoinAccount())
-                .stream().map(Transactions::toDto).collect(Collectors.toList()));
+        Page<Transactions> transactions = transactionsRepository.findAllByCoinAccount(pageable, user.getCoinAccount());
+        return new PageImpl<>(transactions.stream().map(Transactions::toDto).collect(Collectors.toList()), pageable, transactions.getTotalElements());
     }
 }

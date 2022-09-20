@@ -12,5 +12,9 @@ public interface TransactionsRepository extends JpaRepository<Transactions, Long
 
     Page<Transactions> findAllByCoinAccount(Pageable pageable, CoinAccount coinAccount);
 
+    Page<Transactions> findAllByCoinAccountAndSymbol(Pageable pageable, CoinAccount coinAccount, String symbol);
+
     Page<Transactions> findAllByCoinAccountAndSide(Pageable pageable, CoinAccount coinAccount, String side);
+
+    Page<Transactions> findAllByCoinAccountAndSideAndSymbol(Pageable pageable, CoinAccount coinAccount, String side, String symbol);
 }

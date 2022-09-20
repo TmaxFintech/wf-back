@@ -32,8 +32,8 @@ public class TransactionsController {
     }
 
     @GetMapping("/transactions")
-    public ResponseEntity<DefaultResponse> retrieveTransactionsPage(@RequestParam(required = false) String side, @RequestHeader HttpHeaders headers, @PageableDefault(size = 10, sort = "tradingTime", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<DefaultResponse> retrieveTransactionsPage(@RequestParam(required = false) String symbol, @RequestParam(required = false) String side, @RequestHeader HttpHeaders headers, @PageableDefault(size = 10, sort = "tradingTime", direction = Sort.Direction.DESC) Pageable pageable) {
         String username = jwtUtility.getUsernameFromJwtToken(jwtUtility.getJwtTokenFromHeader(headers));
-        return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), GET_TRANSACTIONS_SUCCESS, transactionsService.retrieveTransactionsPage(side, pageable, username)), HttpStatus.OK);
+        return new ResponseEntity(DefaultResponse.response(HttpStatus.OK.value(), GET_TRANSACTIONS_SUCCESS, transactionsService.retrieveTransactionsPage(symbol, side, pageable, username)), HttpStatus.OK);
     }
 }

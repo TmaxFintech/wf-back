@@ -37,10 +37,18 @@ public class TransactionsService {
         this.userRepository = userRepository;
     }
 
-    public Page<TransactionsResponseDto> retrieveTransactionsPage(String side, Pageable pageable, String username) {
+    public Page<TransactionsResponseDto> retrieveTransactionsPage(String symbol, String side, Pageable pageable, String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
         if (side != null) {
+            if (symbol != null) {
+                Page<Transactions> transactions = transactionsRepository.findAllByCoinAccountAndSideAndSymbol(pageable, user.getCoinAccount(), side, symbol);
+                return new PageImpl<>(transactions.stream().map(Transactions::toDto).collect(Collectors.toList()), pageable, transactions.getTotalElements());
+            }
             Page<Transactions> transactions = transactionsRepository.findAllByCoinAccountAndSide(pageable, user.getCoinAccount(), side);
+            return new PageImpl<>(transactions.stream().map(Transactions::toDto).collect(Collectors.toList()), pageable, transactions.getTotalElements());
+        }
+        if (symbol != null) {
+            Page<Transactions> transactions = transactionsRepository.findAllByCoinAccountAndSymbol(pageable, user.getCoinAccount(), symbol);
             return new PageImpl<>(transactions.stream().map(Transactions::toDto).collect(Collectors.toList()), pageable, transactions.getTotalElements());
         }
         Page<Transactions> transactions = transactionsRepository.findAllByCoinAccount(pageable, user.getCoinAccount());
